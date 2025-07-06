@@ -1,103 +1,116 @@
-import Image from "next/image";
+'use client';
+import { useState, useMemo } from 'react';
+import { format } from 'date-fns';
+
+import useTransactions from './hooks/useTransactions';
+import useBudgets from './hooks/useBudgets';
+import { prepareMonthlyData, getPieChartData, getBudgetComparisonData } from './utils/chartUtils';
+import DashboardHeader from './components/Dashboard/Header';
+import MonthlyChartCard from './components/Summary/MonthlyChartCard';
+import CategoryChartCard from './components/Summary/CategoryChartCard';
+import TransactionsList from './components/Transactions/TransactionList';
+import TransactionForm from './components/Transactions/TransactionForm';
+import BudgetForm from './components/Budgets/BudgetForm';
+import BudgetComparisonChart from './components/Budgets/BudgetComparisonChart';
+import BudgetCategoryChart from './components/Budgets/BudgetCategoryChart';
+import BudgetInsightCard from './components/Budgets/BudgetInsightCard';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [isTransactionFormOpen, setIsTransactionFormOpen] = useState(false);
+  const [isBudgetFormOpen, setIsBudgetFormOpen] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const { transactions, fetchTransactions, deleteTransaction } = useTransactions();
+  const { budgets, saveBudget } = useBudgets();
+
+  const thisMonth = format(new Date(), 'yyyy-MM');
+  const monthlyData = useMemo(() => prepareMonthlyData(transactions), [transactions]);
+  const pieChartData = useMemo(() => getPieChartData(transactions), [transactions]);
+  const budgetComparisonData = useMemo(
+    () => getBudgetComparisonData(transactions, budgets, thisMonth),
+    [transactions, budgets, thisMonth]
+  );
+
+  const budgetCategoryChartData = useMemo(() => {
+    return budgets
+      .filter((b) => b.month === thisMonth)
+      .map((b) => ({
+        category: b.category,
+        amount: b.amount,
+      }));
+  }, [budgets, thisMonth]);
+
+  const budgetInsights = useMemo(() => {
+    return budgetComparisonData.map((b) => {
+      const diff = b.actual - b.budget;
+      return {
+        category: b.category,
+        diff,
+        status: diff > 0 ? 'overspent' : 'under',
+      };
+    });
+  }, [budgetComparisonData]);
+
+  const totalExpenses = useMemo(() =>
+    transactions.reduce((sum, t) => sum + t.amount, 0), [transactions]);
+
+  return (
+    <main className="container mx-auto py-8 lg:px-5 px-2">
+      <DashboardHeader onAddTransaction={() => setIsTransactionFormOpen(true)} onAddBudget={() => setIsBudgetFormOpen(true)} />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+        <div className="bg-white rounded-lg shadow p-4 h-full">
+          <h3 className="text-sm text-gray-500">Total Expenses</h3>
+          <p className="text-xl font-semibold text-gray-800">${totalExpenses.toFixed(2)}</p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        <BudgetInsightCard insights={budgetInsights} />
+      </div>
+
+
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <MonthlyChartCard data={monthlyData} />
+        <div className="bg-white rounded-lg shadow p-6">
+          <BudgetComparisonChart data={budgetComparisonData} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <CategoryChartCard data={pieChartData} />
+        <div className="bg-white rounded-lg shadow p-6">
+          <BudgetCategoryChart data={budgetCategoryChartData} />
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-semibold mb-4">Recent Transactions</h2>
+        <TransactionsList
+          transactions={transactions}
+          onDelete={deleteTransaction}
+          onEdit={(t) => {
+            setEditingTransaction(t);
+            setIsTransactionFormOpen(true);
+          }}
+        />
+      </div>
+
+      <TransactionForm
+        open={isTransactionFormOpen}
+        onOpenChange={(open) => {
+          setIsTransactionFormOpen(open);
+          if (!open) setEditingTransaction(null);
+        }}
+        onSuccess={fetchTransactions}
+        transaction={editingTransaction}
+      />
+
+      <BudgetForm
+        onSubmit={saveBudget}
+        open={isBudgetFormOpen}
+        onOpenChange={setIsBudgetFormOpen}
+      />
+    </main>
   );
 }

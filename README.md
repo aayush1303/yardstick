@@ -1,36 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+# 💸 Yardstick – Personal Finance Visualizer
 
-First, run the development server:
+A simple, responsive personal finance tracking application built with **Next.js**, **React**, **shadcn/ui**, **MongoDB**, and **Recharts**.
+
+> GitHub Repository: [aayush1303/yardstick](https://github.com/aayush1303/yardstick.git)
+
+---
+
+## Features
+
+###  Stage 1: Basic Transaction Tracking
+- Add/Edit/Delete transactions (amount, date, description)
+- View all transactions in a list
+- Monthly expenses bar chart
+- Form validation using Zod and React Hook Form
+
+###  Stage 2: Categories
+- Predefined categories for transactions
+- Category-wise pie chart
+- Dashboard summary:
+  - Total expenses
+  - Category breakdown
+  - Most recent transactions
+
+###  Stage 3: Budgeting
+- Set monthly category budgets
+- Budget vs Actual bar chart
+- Budget insight text summaries (e.g., "Overspent by $20")
+- Budget charts and spending visualizations
+
+---
+
+## 🧱 Tech Stack
+
+- **Next.js (App Router)**
+- **React**
+- **shadcn/ui**
+- **Tailwind CSS**
+- **MongoDB (via API routes)**
+- **Recharts**
+
+---
+
+## 🛠️ Getting Started
+
+Clone the repository:
+
+```bash
+git clone https://github.com/aayush1303/yardstick.git
+cd yardstick
+```
+
+Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+```
+
+Run the development server:
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🌐 Deployment
 
-## Learn More
+This project is ready to deploy on [Vercel](https://vercel.com).
 
-To learn more about Next.js, take a look at the following resources:
+To deploy:
+1. Push the code to GitHub.
+2. Connect the repo on Vercel.
+3. Set up your environment variables (e.g., MongoDB connection string).
+4. Deploy and enjoy 🎉
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📁 Project Structure
 
-## Deploy on Vercel
+```
+app/
+  api/
+    budgets/
+    transactions/
+  layout.js
+  page.js
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+components/
+  transactions/
+  budgets/
+  summary/
+  ui/
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+hooks/
+  useBudgets.js
+  useTransactions.js
+
+utils/
+  chartUtils.js
+
+public/
+  favicon.png
+
+styles/
+  globals.css
+```
+
