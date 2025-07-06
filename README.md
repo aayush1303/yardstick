@@ -94,10 +94,10 @@ app/
   page.js
 
 components/
-  transactions/
-  budgets/
-  summary/
-  ui/
+  Transactions/
+  Budgets/
+  Summary/
+  Dashboard/
 
 hooks/
   useBudgets.js
